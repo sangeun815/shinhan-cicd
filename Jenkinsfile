@@ -43,6 +43,15 @@ pipeline {
                 sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
+        
+        stage('Docker Clean Up') {
+            steps {
+                script {
+                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}" // 이미지 삭제
+                    sh "docker image prune -f" // 사용하지 않는 이미지 삭제
+                }
+            }
+        }
     }
 }
 
