@@ -75,5 +75,12 @@ pipeline {
                 }
             }
         }
+        stage('Update Image Version File') {
+            steps {
+                script {
+                    writeFile file: 'ESTHETE_USER_IMAGE_TAG.txt', text: env.IMAGE_TAG
+                }
+            }
+        }
     }
 }
