@@ -31,21 +31,26 @@ pipeline {
         stage('Determine Docker Image Version') {
             steps {
                 script {
-                    def lastImage = sh(script: "docker images --format '{{.Tag}}' ${IMAGE_NAME} | sort -t. -k1,1nr -k2,2nr -k3,3nr | head -n 1", returnStdout: true).trim()
-                    def versionParts = lastImage.tokenize('.')
-                    def majorVersion = versionParts[0] as int
-                    def minorVersion = versionParts[1] as int
+                    def lastImageVersion
+                    def lastImageTag = readFile('ESTHETE_USER_IMAGE_TAG.txt').trim()
 
-                    // 이미지 버전 증가
-                    minorVersion += 1
-                    if (minorVersion >= 10) {
-                        majorVersion += 1
-                        minorVersion = 0
+                    if (lastImageTag) {
+                        lastImageVersion = lastImageTag.tokenize('.')
+                        def majorVersion = lastImageVersion[0] as int
+                        def minorVersion = lastImageVersion[1] as int
+
+                        // 이미지 버전 증가
+                        minorVersion += 1
+                        if (minorVersion >= 10) {
+                            majorVersion += 1
+                            minorVersion = 0
+                        }
+
+                        env.IMAGE_TAG = "${majorVersion}.${minorVersion}"
+                        currentBuild.description = "Docker 이미지 버전: ${env.IMAGE_TAG}"
+                    } else {
+                        error("이전 이미지 버전 정보를 읽어올 수 없습니다.")
                     }
-
-                    def nextVersion = "${majorVersion}.${minorVersion}"
-                    currentBuild.description = "Docker 이미지 버전: ${nextVersion}"
-                    env.IMAGE_TAG = nextVersion
                 }
             }
         }
