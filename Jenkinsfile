@@ -4,7 +4,6 @@ pipeline {
     environment {
         // 환경 변수 설정
         IMAGE_NAME = 'lsb8375/esthete-user-service'
-        IMAGE_TAG = 'latest'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_jenkins')
         JOB_NAME = 'esthete-user-service'
     }
@@ -23,27 +22,46 @@ pipeline {
             }
         }
 
-        stage('DockerHub Login'){
-            steps{
+        stage('DockerHub Login') {
+            steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' // docker hub 로그인
             }
         }
-        stage('Docker Build') {
+
+        stage('Determine Docker Image Version') {
             steps {
-                sh '''
-                   docker build -t ${IMAGE_NAME}:${IMAGE_TAG} --platform linux/amd64 -f /var/jenkins_home/workspace/${JOB_NAME}/Dockerfile /var/jenkins_home/workspace/${JOB_NAME}
-                   '''
-                //-f {Dockerfile경로} {Build할 디렉토리경로}
+                script {
+                    def lastImage = sh(script: "docker images --format '{{.Tag}}' ${IMAGE_NAME} | sort -t. -k1,1nr -k2,2nr -k3,3nr | head -n 1", returnStdout: true).trim()
+                    def versionParts = lastImage.tokenize('.')
+                    def majorVersion = versionParts[0] as int
+                    def minorVersion = versionParts[1] as int
+
+                    // 이미지 버전 증가
+                    minorVersion += 1
+                    if (minorVersion >= 10) {
+                        majorVersion += 1
+                        minorVersion = 0
+                    }
+
+                    def nextVersion = "${majorVersion}.${minorVersion}"
+                    currentBuild.description = "Docker 이미지 버전: ${nextVersion}"
+                    env.IMAGE_TAG = nextVersion
+                }
             }
         }
 
+        stage('Docker Build') {
+            steps {
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} --platform linux/amd64 -f /var/jenkins_home/workspace/${JOB_NAME}/Dockerfile /var/jenkins_home/workspace/${JOB_NAME}"
+            }
+        }
 
         stage('Docker Push to Docker Hub') {
             steps {
                 sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
-        
+
         stage('Docker Clean Up') {
             steps {
                 script {
@@ -54,4 +72,3 @@ pipeline {
         }
     }
 }
-
