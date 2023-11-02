@@ -32,7 +32,7 @@ pipeline {
             steps {
                 script {
                     def lastImageVersion
-                    def lastImageTag = readFile('ESTHETE_USER_IMAGE_TAG.txt').trim()
+                    def lastImageTag = readFile('../${JOB_NAME}-image-tag.txt').trim()
 
                     if (lastImageTag) {
                         lastImageVersion = lastImageTag.tokenize('.')
@@ -78,7 +78,7 @@ pipeline {
         stage('Update Image Version File') {
             steps {
                 script {
-                    writeFile file: 'ESTHETE_USER_IMAGE_TAG.txt', text: env.IMAGE_TAG
+                    writeFile file: '../${JOB_NAME}-image-tag.txt', text: env.IMAGE_TAG
                 }
             }
         }
