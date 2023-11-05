@@ -6,6 +6,7 @@ pipeline {
         IMAGE_NAME = 'lsb8375/esthete-user-service'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_jenkins')
         JOB_NAME = 'esthete-user-service'
+        GITHUB_TOKEN = credentials('ghp_write_repo')
     }
 
     stages {
@@ -79,6 +80,72 @@ pipeline {
             steps {
                 script {
                     writeFile file: "../${JOB_NAME}-image-tag.txt", text: env.IMAGE_TAG
+                }
+            }
+        }
+        stage('Update values.yaml on GitHub') {
+            steps {
+                script {
+                    def githubToken = env.GITHUB_TOKEN
+
+                    def githubRepo = 'dgu-web-t3-blackshoe/esthete-gitops'
+
+                    def filePath = 'esthete-charts/esthete-user-chart/values.yaml'
+
+                    def newContents = """
+# Default values for esthete-user-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# esthete-deployment-chart/values.yaml
+
+replicaCount: 1
+
+image:
+  repository: lsb8375/esthete-user-service
+  tag: ${env.IMAGE_TAG}
+
+containerPort: 8080
+
+ingress:
+  enabled: true
+
+controller:
+  ## Argo controller commandline flags
+  args:
+    appResyncPeriod: \"60\"
+"""
+                    def shaOutput = sh(script: """
+curl -s -X GET \\
+-H "Accept: application/vnd.github+json" \\
+-H "X-GitHub-Api-Version: 2022-11-28" \\
+-H 'Authorization: Bearer ${githubToken}' https://api.github.com/repos/${githubRepo}/contents/${filePath}?ref=deployment | jq -r '.sha'
+""", returnStdout: true)
+
+                    def sha = shaOutput.trim() // 가져온 출력의 앞뒤 공백을 제거하고 저장
+                    println("sha: ${sha}")
+
+                    // newContents를 파일에 저장
+                    def newContentsFile = writeFile file: "temp-new-contents.yaml", text: newContents
+
+                    // 파일을 base64로 인코딩
+                    def base64Contents = sh(script: "cat temp-new-contents.yaml | base64 | tr -d '\\n'", returnStdout: true)
+
+
+                    println("base64Contents: ${base64Contents}")
+                    // 파일 삭제
+                    sh "rm temp-new-contents.yaml"
+
+                    def response = sh(script: """
+curl -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${githubToken}" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/${githubRepo}/contents/${filePath} -d '{"message": "Chore: Update values.yaml by Jenkins","content": "${base64Contents}","branch": "deployment","sha": "$sha"}'
+""", returnStatus: true)
+
+                    if (response == 0) {
+                        currentBuild.result = 'SUCCESS'
+                    } else {
+                        currentBuild.result = 'FAILURE'
+                        error("GitHub의 values.yaml를 업데이트하지 못했습니다.")
+                    }
                 }
             }
         }
