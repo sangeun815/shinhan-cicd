@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // 환경 변수 설정
-        IMAGE_NAME = 'lsb8375/esthete-user-service'
+        IMAGE_NAME = 'lsb8375/esthete-user'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_jenkins')
         JOB_NAME = 'esthete-user-service'
         GITHUB_TOKEN = credentials('ghp_write_repo')
@@ -102,7 +102,7 @@ pipeline {
 replicaCount: 1
 
 image:
-  repository: lsb8375/esthete-user-service
+  repository: lsb8375/esthete-user
   tag: ${env.IMAGE_TAG}
 
 containerPort: 8080
