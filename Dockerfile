@@ -8,10 +8,10 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 
 # JAR 파일을 작업 디렉토리에 추가
-ADD ./build/libs/esthete-user-service-0.0.1-SNAPSHOT.jar esthete-user-service.jar
+ADD ./build/libs/esthete-user-service-0.0.1-SNAPSHOT.jar shinhan-cicd.jar
 
 # 포트 설정
 EXPOSE 8080
 
 # 앱 실행
-ENTRYPOINT ["java","-jar","esthete-user-service.jar"]
+ENTRYPOINT ["java","-jar","shinhan-cicd.jar"]
