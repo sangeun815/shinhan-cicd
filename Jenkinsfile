@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // 환경 변수 설정
-        IMAGE_NAME = 'lsb8375/shinhan-cicd'
+        IMAGE_NAME = 'sangeun815/shinhan-cicd'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_jenkins')
         JOB_NAME = 'shinhan-cicd'
         GITHUB_TOKEN = credentials('ghp_write_repo')
@@ -93,7 +93,7 @@ pipeline {
                     def filePath = 'shinhan-charts/shinhan-chart/values.yaml'
 
                     def newContents = """
-# Default values for esthete-user-chart.
+# Default values for shinhan-cicd-chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -102,7 +102,7 @@ pipeline {
 replicaCount: 1
 
 image:
-  repository: lsb8375/esthete-user
+  repository: sangeun815/shinhan-cicd
   tag: ${env.IMAGE_TAG}
 
 containerPort: 8080
