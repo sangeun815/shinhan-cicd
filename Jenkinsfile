@@ -88,9 +88,9 @@ pipeline {
                 script {
                     def githubToken = env.GITHUB_TOKEN
 
-                    def githubRepo = 'dgu-web-t3-blackshoe/esthete-gitops'
+                    def githubRepo = 'bin-pro/nks-gitops'
 
-                    def filePath = 'esthete-charts/esthete-user-chart/values.yaml'
+                    def filePath = 'shinhan-charts/shinhan-chart/values.yaml'
 
                     def newContents = """
 # Default values for esthete-user-chart.
