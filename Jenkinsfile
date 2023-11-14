@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // 환경 변수 설정
-        IMAGE_NAME = 'sangeun815/shinhan-cicd'
+        IMAGE_NAME = 'grace0857/shinhan-cicd'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_jenkins')
         JOB_NAME = 'shinhan-cicd'
         GITHUB_TOKEN = credentials('ghp_write_repo')
@@ -88,7 +88,7 @@ pipeline {
                 script {
                     def githubToken = env.GITHUB_TOKEN
 
-                    def githubRepo = 'bin-pro/nks-gitops'
+                    def githubRepo = 'sangeun815/nks-gitops'
 
                     def filePath = 'shinhan-charts/shinhan-chart/values.yaml'
 
@@ -102,7 +102,7 @@ pipeline {
 replicaCount: 1
 
 image:
-  repository: sangeun815/shinhan-cicd
+  repository: grace0857/shinhan-cicd
   tag: ${env.IMAGE_TAG}
 
 containerPort: 8080
