@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         // 환경 변수 설정
-        IMAGE_NAME = 'lsb8375/esthete-user'
+        IMAGE_NAME = 'lsb8375/shinhan-cicd'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_jenkins')
-        JOB_NAME = 'esthete-user-service'
+        JOB_NAME = 'shinhan-cicd'
         GITHUB_TOKEN = credentials('ghp_write_repo')
     }
 
