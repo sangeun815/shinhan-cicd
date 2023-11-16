@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("sangeun")
 public class TestController {
-    @GetMapping("/test")
+    @GetMapping("/shinhan_security_intern_cicd_test")
     String test() {
-        return "userTest";
+        return "ICT 기획/운영부 CI/CD 테스트";
     }
 }
