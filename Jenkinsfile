@@ -137,7 +137,7 @@ curl -s -X GET \\
                     sh "rm temp-new-contents.yaml"
 
                     def response = sh(script: """
-curl -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${githubToken}" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/${githubRepo}/contents/${filePath} -d '{"message": "Chore: Update values.yaml by Jenkins","content": "${base64Contents}","branch": "deployment","sha": "$sha"}'
+curl -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${githubToken}" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/${githubRepo}/contents/${filePath} -d '{"message": "Chore: Update values.yaml by Jenkins","content": "${base64Contents}","branch": "main","sha": "$sha"}'
 """, returnStatus: true)
 
                     if (response == 0) {
